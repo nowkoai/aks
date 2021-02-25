@@ -130,7 +130,7 @@ az aks get-credentials --admin --resource-group $AKS_RES_GROUP --name $AKS_CLUST
 ## kubectlコマンドを使ったクラスターの操作
 MacOSから、kubectlコマンド実行してみる
 
-###接続先クラスターの確認
+### 接続先クラスターの確認
 ```
 kubectl config view
 ```
@@ -140,17 +140,17 @@ MacOSのkubectlコマンドは、ここに接続している
 ```
 kubectl cluster-info
 ```
-K8sクラスター上で動くNodeの一覧
+
+### K8sクラスター上で動くNodeの一覧
+```
+kubectl get node
+```
+３台のNodeが動いてるね（NodeはAzureの仮想マシン）
 
 ```
 kubectl get node -o=wide
 ```
 -o=wideをつけると、Nodeの追加情報表示（IPやOSバージョン等）
-
-```
-kubectl get node
-```
-３台のNodeが動いてるね（NodeはAzureの仮想マシン）
 
 ```
 kubectl describe node aks-nodepool1-25600466-vmss000000
@@ -162,12 +162,12 @@ kubectl get node -o=jsonpath='{.items[0].metadata.name}'
 ```
 クラスタノードから、1台目の名前のみ表示
 
-ヘルプ
+### ヘルプ
 ```
 kubectl help
 ```
 
-kubectl補完
+### kubectl補完
 ```
 echo "source <(kubectl completion bash)" >> ~/.bashrc
 ```
