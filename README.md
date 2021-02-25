@@ -44,7 +44,7 @@ az group create --resource-group $ACR_RES_GROUP --location japaneast
 ```
 az acr create --resource-group $ACR_RES_GROUP --name $ACR_NAME --sku Standard --location japaneast
 ```
-loginServerが、"acr0225.azurecr.io"（指定したACR名）になっていることを確認
+コマンド出力で、loginServerが、"acr0225.azurecr.io"（指定したACR名）になっていることを確認
 
 ### テスト用サンプルコードのダウンロード
 ```
@@ -58,32 +58,38 @@ cd aks/dockerImage
 az acr build --registry $ACR_NAME --image photo-view:v1.0 v1.0/
 az acr build --registry $ACR_NAME --image photo-view:v2.0 v2.0/
 ```
-※とりあえず、２つのバージョンをACRにプッシュ（あとで、バージョンアップしてみる）
+とりあえず、２つのバージョンをACRにプッシュ（あとで、バージョンアップしてみる）
 
 ### イメージの確認
 ```
 az acr repository show-tags -n $ACR_NAME --repository photo-view
 ```
-※AzurePortalのコンテナレジストリでも確認してみる！
+AzurePortalのコンテナレジストリでも確認してみる！
 
 
-------------------------------------
-★ACRとAKSの連携
-------------------------------------
---ACRのリソースID
+## ACRとAKSの連携のためのID/パスワード
+### ACRのリソースID
+```
 az acr show --name $ACR_NAME --query id --output tsv
 ACR_ID=$(az acr show --name $ACR_NAME --query id --output tsv)
+```
 
---サービスプリンシパル名の環境変数
+### サービスプリンシパル名の環境変数
+```
 SP_NAME=sample-acr-service-principal
+```
 
-----サービスプリンシパルのパスワード！！
+### サービスプリンシパルのパスワード！
+```
 az ad sp create-for-rbac --name $SP_NAME --role Reader --scopes $ACR_ID --query password --output tsv
 SP_PASSWD=$(az ad sp create-for-rbac --name $SP_NAME --role Reader --scopes $ACR_ID --query password --output tsv)
+```
 
-------サービスプリンシパルのID！！
+### サービスプリンシパルのID！
+```
 az ad sp show --id http://$SP_NAME --query appId --output tsv
 APP_ID=$(az ad sp show --id http://$SP_NAME --query appId --output tsv)
+```
 
 
 ------------------------------------
