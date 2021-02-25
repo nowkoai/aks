@@ -1,19 +1,25 @@
+# はじめての Azure Kubernetes Service(AKS)
+AKSを始めるための環境セットアップ/デプロイ/動作確認
 
-------------------------------------
-■Macのセットアップ
-------------------------------------
-==Azure CLI==
+## MacOSのセットアップ
+### Azure CLI
+```
 brew install azure-client
 az login
+```
 
-==リソースプロバイダ有効== #いらないかも？？
+### リソースプロバイダ有効== #いらないかも？？
+```
 az provider register -n Microsoft.Network
 az provider register -n Microsoft.Storage
 az provider register -n Microsoft.Compute
 az provider register -n Microsoft.ContainerService
+```
 
-==Kubectl==
+### Kubectl
+```
 brew install kubernetes-cli
+```
 
 
 ------------------------------------
