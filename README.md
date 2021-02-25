@@ -64,7 +64,7 @@ az acr build --registry $ACR_NAME --image photo-view:v2.0 v2.0/
 ```
 az acr repository show-tags -n $ACR_NAME --repository photo-view
 ```
-AzurePortalのコンテナレジストリでも確認してみる！
+ブラウザ/AzurePortalで、コンテナレジストリの確認してみる！
 
 
 ## ACRとAKSの連携のためのID/パスワード
@@ -92,19 +92,21 @@ APP_ID=$(az ad sp show --id http://$SP_NAME --query appId --output tsv)
 ```
 
 
-------------------------------------
-■AKSでの、Kubernetesクラスターの構築
-------------------------------------
---クラスタの作成のための環境変数
+## AKSでの、Kubernetesクラスターの構築
+### クラスタの作成のための環境変数
+```
 AKS_CLUSTER_NAME=AKSCluster
 AKS_RES_GROUP=yama_akscluster
+```
 
---> リソースグループの作成
+### リソースグループの作成
+```
 az group create --resource-group $AKS_RES_GROUP --location japaneast
+```
 
---> AKSでKubernetesクラスタを作成
-## ACRとAKS連携のためのパラーメータあり
---------------------------------------
+
+### AKSでKubernetesクラスタを作成
+```
 az aks create \
   --name $AKS_CLUSTER_NAME \
   --resource-group $AKS_RES_GROUP \
@@ -114,15 +116,18 @@ az aks create \
   --generate-ssh-keys \
   --service-principal $APP_ID \
   --client-secret $SP_PASSWD
---------------------------------------
+```
+ACRとAKS連携のためのパラーメータあるよね
 
---> クラスタ接続のための認証情報の取得
+
+### Kubernetesクラスタ接続のための認証情報の取得
+```
 az aks get-credentials --admin --resource-group $AKS_RES_GROUP --name $AKS_CLUSTER_NAME
-＃.kube/configファイルに接続情報が書き込まれる
+```
+.kube/configファイルに接続情報を書き込むことで、MacOSからクラスタ操作できるようになる！
 
 
-------------------------------------
-■kubectlコマンドを使ったクラスターの操作
+## kubectlコマンドを使ったクラスターの操作
 ------------------------------------
 ※bash_profileとかに、export |grep KUBECONFIGがあったので削除
 ※kubectl config view で、接続先確認できる！
