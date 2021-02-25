@@ -1,7 +1,7 @@
 # はじめての Azure Kubernetes Service(AKS)
 AKSを始めるための環境セットアップ/デプロイ/動作確認
 
-## MacOSのセットアップ
+## ■ MacOSのセットアップ
 MacOSをAKSのクライアントにするための環境インストール
 
 ### Azure CLI
@@ -25,7 +25,7 @@ brew install kubernetes-cli
 ```
 
 
-## Azure Container Registry
+## ■ Azure Container Registry
 Azure Container Registry は、プライベート Docker コンテナー イメージを格納するために使用される、Azure ベースの管理されたコンテナー レジストリ サービスです。
 
 ### レジストリ作成のための環境変数
@@ -67,7 +67,7 @@ az acr repository show-tags -n $ACR_NAME --repository photo-view
 ブラウザ/AzurePortalで、コンテナレジストリの確認してみる！
 
 
-## ACRとAKSの連携のためのID/パスワード
+## ■ ACRとAKSの連携のためのID/パスワード
 ### ACRのリソースID
 ```
 az acr show --name $ACR_NAME --query id --output tsv
@@ -92,7 +92,7 @@ APP_ID=$(az ad sp show --id http://$SP_NAME --query appId --output tsv)
 ```
 
 
-## AKSでの、Kubernetesクラスターの構築
+## ■ AKSでの、Kubernetesクラスターの構築
 ### クラスタの作成のための環境変数
 ```
 AKS_CLUSTER_NAME=AKSCluster
@@ -128,7 +128,7 @@ az aks get-credentials --admin --resource-group $AKS_RES_GROUP --name $AKS_CLUST
 
 
 
-## kubectlコマンドを使ったクラスターの操作
+## ■ kubectlコマンドを使ったクラスターの操作
 MacOSから、kubectlコマンド実行してみる
 
 ### 接続先クラスターの確認
@@ -174,7 +174,7 @@ echo "source <(kubectl completion bash)" >> ~/.bashrc
 ```
 
 
-## コンテナ/アプリケーションのデプロイ前の事前確認
+## ■ コンテナ/アプリケーションのデプロイ前の事前確認
 > AKS（Kubernetes）--Node（仮想マシン）--コンテナー
 
 ### Node状態
@@ -193,7 +193,7 @@ kubectl get pod
 → アプリはまだデプロイされていない
 
 
-## コンテナ/アプリケーションのデプロイの流れ
+## ■ コンテナ/アプリケーションのデプロイの流れ
 > ACR（コンテナイメージ） ==> AKS（Kubernetes）--Node（仮想マシン）--コンテナー
 > --開発者: kubectlコマンド（deployment.yaml, service.yaml）
 > --ユーザー: アプリケーションの確認（http/https）
@@ -240,15 +240,15 @@ kubectl get svc
 ```
 → クラスターにデプロイしたアプリケーションにアクセスするためのIPアドレスを確認
 
-ロードバランサーで、HTTPリクエストが各Podに分散されてることを確認
-http://Exteral-IP
+- ロードバランサーで、HTTPリクエストが各Podに分散されてることを確認<br />
+→ ブラウザから、http://Exteral-IP
 
-デプロイしたPodの詳細確認
+- デプロイしたPodの詳細確認
 ```
 kubectl describe pods photoview-deployment-58669896bd-7nhcf
 ```
 
-##  課金が気になる場合の対応
+## ■ 課金が気になる場合の対応
 ### Kubernetesクラスタ上のアプリとネットワークの削除コマンド
 ```
 kubectl delete -f service.yaml
