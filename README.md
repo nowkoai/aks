@@ -218,42 +218,58 @@ kubectl get pod
 - PCブラウザでアプリが表示できたら確認完了
 
 
-  
-## コンテナ/アプリケーションのデプロイ実施
-1. アプリケーションのデプロイ（Podを適切な場所に配置）
-＃マニフェストをクラスターに送る
+## ■ コンテナ/アプリケーションのデプロイ実施
+### 1. アプリケーションのデプロイ（Podを適切な場所に配置）
+デプロイ用マニフェストをクラスターに送る
+```
 kubectl apply -f deployment.yaml
+```
+```
 kubectl get pod
 kubectl get pod  -o wide
---> ５つのPodがRunning稼働 on クラスタNode:3台
+```
+→ ５つのPodがRunning稼働 on クラスタNode:3台
 
-==★サービスの公開（外部アクセスのためのネットワーク構成）==
-＃クラスターにデプロイしたアプリケーションにアクセスするためのIPアドレスを確認
+### 2. サービスの公開（外部アクセスのためのネットワーク構成）
+サービス用マニフェストをクラスターに送る
+```
 kubectl apply -f service.yaml
+```
+```
 kubectl get svc
+```
+→ クラスターにデプロイしたアプリケーションにアクセスするためのIPアドレスを確認
 
-＃ロードバランサー構成: リクエストが各Podに分散されてることを確認
+ロードバランサーで、HTTPリクエストが各Podに分散されてることを確認
 http://Exteral-IP
 
-==デプロイしたPodの詳細確認==
+デプロイしたPodの詳細確認
+```
 kubectl describe pods photoview-deployment-58669896bd-7nhcf
-
-------------------------------------
-★クラスタ上のアプリとネットワークの削除コマンド
-kubectl delete -f service.yaml
-kubectl delete -f deployment.yaml
-
---> Kubernetesクラスタを構成する３つのAzure仮想マシンは動いたまま
-------------------------------------
+```
 
 ##  課金が気になる場合の対応
+### Kubernetesクラスタ上のアプリとネットワークの削除コマンド
+```
+kubectl delete -f service.yaml
+kubectl delete -f deployment.yaml
+```
+→ これだけだと、Kubernetesクラスタを構成する３つのAzure仮想マシンは動いたまま、、
+
+### ACRのリソースグループ削除
+```
 ACR_NAME=acr0225
 ACR_RES_GROUP=yama-acr
 az group delete -name $ACR_RES_GROUP
+```
 
+### AKSクラスタのリソースグループ削除
+```
 AKS_CLUSTER_NAME=AKSCluster
 AKS_RES_GROUP=yama_akscluster
 az group delete -name $yama_akscluster
 
 SP_NAME=sample-acr-service-principal
 az ad sp delete --id=$(az ad sp show --id http://$SP_NAME --query appId --output tsv)
+```
+→ とにかく、リソースグループ削除すれば、課金発生しません
