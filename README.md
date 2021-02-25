@@ -40,7 +40,7 @@ ACR_RES_GROUP=yama-acr
 az group create --resource-group $ACR_RES_GROUP --location japaneast
 ```
 
-### ACRのレジストリ作成
+### ★ACRのレジストリ作成
 ```
 az acr create --resource-group $ACR_RES_GROUP --name $ACR_NAME --sku Standard --location japaneast
 ```
@@ -52,8 +52,8 @@ git clone https://github.com/nowkoai/aks.git
 cd aks/dockerImage
 ```
 
-### イメージのビルド
-★az acr buildコマンドでイメージをビルドして、ACRにプッシュします。
+### ★イメージのビルド
+az acr buildコマンドでイメージをビルドして、ACRにプッシュします。
 ```
 az acr build --registry $ACR_NAME --image photo-view:v1.0 v1.0/
 az acr build --registry $ACR_NAME --image photo-view:v2.0 v2.0/
@@ -105,7 +105,7 @@ az group create --resource-group $AKS_RES_GROUP --location japaneast
 ```
 
 
-### AKSでKubernetesクラスタを作成
+### ★AKSでKubernetesクラスタを作成
 ```
 az aks create \
   --name $AKS_CLUSTER_NAME \
@@ -128,74 +128,68 @@ az aks get-credentials --admin --resource-group $AKS_RES_GROUP --name $AKS_CLUST
 
 
 ## kubectlコマンドを使ったクラスターの操作
-------------------------------------
-※bash_profileとかに、export |grep KUBECONFIGがあったので削除
-※kubectl config view で、接続先確認できる！
+MacOSから、kubectlコマンド実行してみる
 
-==コマンド例==
-kubectl get pod
-kubectl get deployment
-kubectl get horizontalpodautoscalers
+###接続先クラスターの確認
+```
+kubectl config view
+```
+MacOSのkubectlコマンドは、ここに接続している
 
-==コマンド実践==
-クラスターの情報確認（K8sで動いてるAPIやアドオン機能状態がわかる）
+### クラスターの情報確認
+```
 kubectl cluster-info
-
+```
 K8sクラスター上で動くNodeの一覧
-kubectl get node
---> ３台のNodeが動いている！
 
-＃-o=wideをつけると、Nodeの追加情報表示（IPやOSバージョン等）
+```
 kubectl get node -o=wide
+```
+-o=wideをつけると、Nodeの追加情報表示（IPやOSバージョン等）
 
-＃３台のNodeのうち、1台の詳細確認
+```
+kubectl get node
+```
+３台のNodeが動いてるね（NodeはAzureの仮想マシン）
+
+```
 kubectl describe node aks-nodepool1-25600466-vmss000000
+```
+３台のNodeのうち、1台の詳細確認できるよ
 
-＃クラスタノードから、1台目の名前のみ表示
+```
 kubectl get node -o=jsonpath='{.items[0].metadata.name}'
+```
+クラスタノードから、1台目の名前のみ表示
 
-＃ヘルプ
+ヘルプ
+```
 kubectl help
+```
 
-※kubectl補完
-source <(kubectl completion bash)
+kubectl補完
+```
 echo "source <(kubectl completion bash)" >> ~/.bashrc
+```
 
 
-------------------------------------
-★課金が気になる場合の対応
-------------------------------------
-ACR_NAME=acr0225
-ACR_RES_GROUP=yama-acr
-az group delete -name $ACR_RES_GROUP
-
-AKS_CLUSTER_NAME=AKSCluster
-AKS_RES_GROUP=yama_akscluster
-az group delete -name $yama_akscluster
-
-SP_NAME=sample-acr-service-principal
-az ad sp delete --id=$(az ad sp show --id http://$SP_NAME --query appId --output tsv)
-
-
-------------------------------------
-■コンテナ/アプリケーションのデプロイの流れ
-------------------------------------
-#1. マニフェストファイルの作成: ymlファイル
+## コンテナ/アプリケーションのデプロイの流れ
+1. マニフェストファイルの作成: ymlファイル
 ・クラスターにどのようなアプリをデプロイして、クライアントからのアクセスをどう処理するかなどの構成情報を定義ファイルで管理
 ・CPU/Memory/NetworkAddressなどのリソース
---> deployment.yaml
---> service.yaml
+- deployment.yaml
+- service.yaml
 
-#2. クラスタでのリソース作成: kubectlコマンド ※ACRからイメージのpull
+2. クラスタでのリソース作成: kubectlコマンド ※ACRからイメージのpull
 ・kubectlコマンドの引数に、マニフェストファイルを指定
 （デプロイしたコンテナアプリケーションやネットワーク構成などをリソースと呼ぶ）
 
 ・Kubernetesクラスタによって、アプリケーションを適切な場所に配置
---> kubectl apply -f deployment.yaml
+- kubectl apply -f deployment.yaml
 ・クラスター外部からアクセスするためのネットワークを構成
---> kubectl apply -f service.yaml
+- kubectl apply -f service.yaml
 
-#3. アプリケーションの動作確認: http/httpsアクセス
+3. アプリケーションの動作確認: http/httpsアクセス
 ・デプロしされたアプリケーションをクラスタ外のネットワークからアクセスして動作確認
 ・PCブラウザでアプリが表示できたら確認完了
 
@@ -246,3 +240,15 @@ kubectl delete -f deployment.yaml
 
 --> Kubernetesクラスタを構成する３つのAzure仮想マシンは動いたまま
 ------------------------------------
+
+##  課金が気になる場合の対応
+ACR_NAME=acr0225
+ACR_RES_GROUP=yama-acr
+az group delete -name $ACR_RES_GROUP
+
+AKS_CLUSTER_NAME=AKSCluster
+AKS_RES_GROUP=yama_akscluster
+az group delete -name $yama_akscluster
+
+SP_NAME=sample-acr-service-principal
+az ad sp delete --id=$(az ad sp show --id http://$SP_NAME --query appId --output tsv)
