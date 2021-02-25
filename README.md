@@ -127,6 +127,7 @@ az aks get-credentials --admin --resource-group $AKS_RES_GROUP --name $AKS_CLUST
 .kube/configファイルに接続情報を書き込むことで、MacOSからクラスタ操作できるようになる！
 
 
+
 ## kubectlコマンドを使ったクラスターの操作
 MacOSから、kubectlコマンド実行してみる
 
@@ -141,7 +142,7 @@ MacOSのkubectlコマンドは、ここに接続している
 kubectl cluster-info
 ```
 
-### K8sクラスター上で動くNodeの一覧
+### クラスター上で動くNodeの一覧
 ```
 kubectl get node
 ```
@@ -173,49 +174,52 @@ echo "source <(kubectl completion bash)" >> ~/.bashrc
 ```
 
 
-## コンテナ/アプリケーションのデプロイの流れ
-1. マニフェストファイルの作成: ymlファイル
-・クラスターにどのようなアプリをデプロイして、クライアントからのアクセスをどう処理するかなどの構成情報を定義ファイルで管理
-・CPU/Memory/NetworkAddressなどのリソース
-- deployment.yaml
-- service.yaml
+## コンテナ/アプリケーションのデプロイ前の事前確認
+> AKS（Kubernetes）--Node（仮想マシン）--コンテナー
 
-2. クラスタでのリソース作成: kubectlコマンド ※ACRからイメージのpull
-・kubectlコマンドの引数に、マニフェストファイルを指定
-（デプロイしたコンテナアプリケーションやネットワーク構成などをリソースと呼ぶ）
-
-・Kubernetesクラスタによって、アプリケーションを適切な場所に配置
-- kubectl apply -f deployment.yaml
-・クラスター外部からアクセスするためのネットワークを構成
-- kubectl apply -f service.yaml
-
-3. アプリケーションの動作確認: http/httpsアクセス
-・デプロしされたアプリケーションをクラスタ外のネットワークからアクセスして動作確認
-・PCブラウザでアプリが表示できたら確認完了
-
-------------------------------------
-ACR（コンテナイメージ） ==> AKS（Kubernetes）--Node（仮想マシン）--コンテナー
---開発者: kubectlコマンド
---ユーザー: アプリケーションの確認（http/https）
-------------------------------------
-deployment.yaml
-service.yaml
-------------------------------------
-
-==※事前確認==
---Node状態
-＃AKSでは、NodeはAzure仮想マシン（Standard_DS1_v2がワーカーノードとして３つ起動してクラスタを構成）
+### Node状態
+AKSでは、Nodeは Azure仮想マシン（Standard_DS1_v2がワーカーノードとして３つ起動してクラスタを構成）
+```
 kubectl get node
 kubectl get node -o wide
---> これらのサーバにアプリケーションをデプロイしていく
+```
+→ これらのサーバにアプリケーションをデプロイしていく
 
---Pod状態
-＃Pod: コンテナアプリケーションの集合体
+### Pod状態
+Podは コンテナアプリケーションの集合体
+```
 kubectl get pod
---> アプリはまだデプロイされていない
+```
+→ アプリはまだデプロイされていない
 
 
-==★アプリケーションのデプロイ（Podを適切な場所に配置）==
+## コンテナ/アプリケーションのデプロイの流れ
+> ACR（コンテナイメージ） ==> AKS（Kubernetes）--Node（仮想マシン）--コンテナー
+> --開発者: kubectlコマンド（deployment.yaml, service.yaml）
+> --ユーザー: アプリケーションの確認（http/https）
+
+1. マニフェストファイルの作成: ymlファイルで構成情報を管理
+- クラスターにどのようなアプリをデプロイするか、CPU/Memoryリソースなどを定義
+  - deployment.yaml
+- クライアントからのアクセスをどう処理するかを定義、/NetworkAddressなどを定義
+  - service.yaml
+
+2. クラスタでのリソース作成: kubectlコマンドでリソース作成
+- kubectlコマンドの引数に、マニフェストファイルを指定
+- Kubernetesクラスタによって、アプリケーションを適切な場所に配置
+  - kubectl apply -f deployment.yaml
+- クラスター外部からアクセスするためのネットワークを構成
+  - kubectl apply -f service.yaml
+- イメージは、ACRからpull
+- デプロイしたコンテナアプリケーションやネットワーク構成などをリソースと呼ぶ
+
+3. アプリケーションの動作確認: http/httpsアクセス
+- デプロイされたアプリケーションに、クラスタ外のネットワークからアクセスして動作確認
+- PCブラウザでアプリが表示できたら確認完了
+
+
+## コンテナ/アプリケーションのデプロイ実施
+1. アプリケーションのデプロイ（Podを適切な場所に配置）
 ＃マニフェストをクラスターに送る
 kubectl apply -f deployment.yaml
 kubectl get pod
