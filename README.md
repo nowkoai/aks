@@ -2,13 +2,16 @@
 AKSを始めるための環境セットアップ/デプロイ/動作確認
 
 ## MacOSのセットアップ
+MacOSをAKSのクライアントにするための環境インストール
+
 ### Azure CLI
 ```
 brew install azure-client
 az login
 ```
 
-### リソースプロバイダ有効== #いらないかも？？
+### リソースプロバイダ有効
+いらないかもだけど？？
 ```
 az provider register -n Microsoft.Network
 az provider register -n Microsoft.Storage
@@ -22,36 +25,46 @@ brew install kubernetes-cli
 ```
 
 
-------------------------------------
-■Azure Container Registry
-------------------------------------
-※Azure Container Registry Tasks: コンテナイメージを自動ビルド
-＃ローカル環境で開発したアプリのソースコード＆DockerfileをACEに転送して、ACER上でイメージをビルド（GitHubとかにコードコミット経由もあり）
+## Azure Container Registry
+Azure Container Registry は、プライベート Docker コンテナー イメージを格納するために使用される、Azure ベースの管理されたコンテナー レジストリ サービスです。
 
-==レジストリの作成のための環境変数==
+### レジストリ作成のための環境変数
+```
 ACR_NAME=acr0225
 ACR_RES_GROUP=yama-acr
+```
+値はユニークなものを設定ください
 
---リソースグループの作成
+### リソースグループの作成
+```
 az group create --resource-group $ACR_RES_GROUP --location japaneast
+```
 
---ACRのレジストリ作成
+### ACRのレジストリ作成
+```
 az acr create --resource-group $ACR_RES_GROUP --name $ACR_NAME --sku Standard --location japaneast
+```
+loginServerが、"acr0225.azurecr.io"（指定したACR名）になっていることを確認
 
----->> "loginServer": "acr0225.azurecr.io",
-#########################################
-git clone https://github.com/ToruMakabe/Understanding-K8s
-#########################################
+### テスト用サンプルコードのダウンロード
+```
+git clone https://github.com/nowkoai/aks.git
+cd aks/dockerImage
+```
 
-
-==イメージのビルド==
-＃サンプルコードを用意！
+### イメージのビルド
+★az acr buildコマンドでイメージをビルドして、ACRにプッシュします。
+```
 az acr build --registry $ACR_NAME --image photo-view:v1.0 v1.0/
 az acr build --registry $ACR_NAME --image photo-view:v2.0 v2.0/
+```
+※とりあえず、２つのバージョンをACRにプッシュ（あとで、バージョンアップしてみる）
 
-==イメージの確認==
+### イメージの確認
+```
 az acr repository show-tags -n $ACR_NAME --repository photo-view
-＃AzurePortalのコンテナレジストリでも確認！
+```
+※AzurePortalのコンテナレジストリでも確認してみる！
 
 
 ------------------------------------
