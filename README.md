@@ -9,9 +9,10 @@ MacOSをAKSのクライアントにするための環境インストール
 brew install azure-client
 az login
 ```
+注) az login コマンドを使用して Azure CLI にサインインできることを確認
 
 ### リソースプロバイダ有効
-いらないかもだけど？？
+いらないかもだけど、、入力なしでは試してない
 ```
 az provider register -n Microsoft.Network
 az provider register -n Microsoft.Storage
@@ -22,7 +23,9 @@ az provider register -n Microsoft.ContainerService
 ### Kubectl
 ```
 brew install kubernetes-cli
+kubectl version
 ```
+注) kubectlのバージョン確認
 
 
 ## ■ Azure Container Registry
@@ -33,7 +36,7 @@ Azure Container Registry は、プライベート Docker コンテナー イメ�
 ACR_NAME=acr0225
 ACR_RES_GROUP=yama-acr
 ```
-値はユニークなものを設定ください
+注）値はユニークなものを設定ください
 
 ### リソースグループの作成
 ```
@@ -44,7 +47,7 @@ az group create --resource-group $ACR_RES_GROUP --location japaneast
 ```
 az acr create --resource-group $ACR_RES_GROUP --name $ACR_NAME --sku Standard --location japaneast
 ```
-コマンド出力で、loginServerが、"acr0225.azurecr.io"（指定したACR名）になっていることを確認
+注）コマンド出力で、loginServerが、"acr0225.azurecr.io"（指定したACR名）になっていることを確認
 
 ### テスト用サンプルコードのダウンロード
 ```
@@ -78,6 +81,7 @@ ACR_ID=$(az acr show --name $ACR_NAME --query id --output tsv)
 ```
 SP_NAME=sample-acr-service-principal
 ```
+注）値はユニークなものを設定ください
 
 ### サービスプリンシパルのパスワード！
 ```
@@ -224,6 +228,8 @@ kubectl get pod
 ```
 kubectl apply -f deployment.yaml
 ```
+注）コンテナイメージのパス（image: acr0225.azurecr.io/photo-view:v1.0）の修正を行う（acr0225のとこ）
+
 ```
 kubectl get pod
 kubectl get pod  -o wide
